@@ -8,7 +8,7 @@ Utilities for drawing to a PDF file
 
 VERSION=: ''
 
-RELEASE=: 'j804'
+RELEASE=: 'j804 j805'
 
 FILES=: 0 : 0
 pdfdraw.ijs
