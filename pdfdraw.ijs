@@ -234,7 +234,7 @@ MSUNGLIGHT=: 0 : 0
 /Name /F
 /BaseFont /MSung-Light
 /DescendantFonts [ %prev 0 R ]
-/Encoding /UniCNS-UCS2-H
+/Encoding /UniCNS-UTF16-H
 )
 
 NB. =========================================================
@@ -263,7 +263,7 @@ STSONGLIGHT=: 0 : 0
 /Name /F
 /BaseFont /STSong-Light
 /DescendantFonts [ %prev 0 R ]
-/Encoding /UniGB-UCS2-H
+/Encoding /UniGB-UTF16-H
 )
 NB. cmds
 NB.
