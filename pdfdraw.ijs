@@ -14,37 +14,32 @@ FontSizeMin=: 0
 
 PDFFonts=: ,<'Helvetica'
 PDFClip=: 0 NB. count of clip stack
+
+CIDFONTS=: 'MSung-Light';'STSong-Light'
 NB. util
 
 buf=: ''
 
-('i',each ;: 'Left Center Right')=: i. 3
+('i',each ;: 'LEFT CENTER RIGHT')=: i. 3
 
 is1color=: 3 = */@$
 citemize=: ,:^:(2 > #@$)
 getfontsize=: 13 : '{.1{._1 -.~ _1 ". y'
+log10=: 10&^.
 pbuf=: 3 : 'buf=: buf,,y,"1 LF'
+pow10=: 10&^
+rectcolor=: [: glpen 1 1 [ glbrush @ glrgb
 round=: [ * [: <. 0.5 + %~
+rounddown=: [ * [: <. %~
+roundint=: <. @ (0.5&+)
+roundup=: [ * [: >. %~
+scale01=: (% {:) @: (0: , +/\)
 toucode1=: ''&,@:,@:(|."1@(_2: ]\ 1&(3!:4)))@(3&u:)@u:
 u2a=: (1 u: 7 u: ]) :: ]
 
 pextent=: 0.75 * getextent
 hextent=: {. @ pextent
 vextent=: {: @ pextent
-
-rectcolor=: [: glpen 1 1 [ glbrush @ glrgb
-rndint=: <. @ (0.5&+)
-
-NB. =========================================================
-NB. dict
-dict=: 3 : 0
-if. L. y do.
-  s=. ; y ,each <LF
-else.
-  s=. y , (LF ~: {: y) # LF
-end.
-'<<',LF,s,'>>',LF
-)
 
 NB. =========================================================
 getplotfontsize=: 3 : 0
@@ -55,24 +50,13 @@ else.
 end.
 )
 
-NB. =========================================================
-NB. getparms
-getparms=: 3 : 0
-(Size;DEFFILE) output_parms y
-)
-
-NB. =========================================================
-NB. jpf_getparms
-jpf_getparms=: 3 : 0
-(Size;JPF_DEFFILE) output_parms y
-)
 
 NB. =========================================================
 NB. pattern linepattern1 (x0,y0), (x1,y1)
 NB. blank at end
 linepattern1=: 4 : 0
 len=. - -/ y
-n=. rndint (%: +/ *: len) % +/ x
+n=. roundint (%: +/ *: len) % +/ x
 if. n=0 do. y
 else.
   j=. +/\ 0 , , n # ,: x
@@ -85,7 +69,7 @@ NB. pattern linepattern2 (x0,y0), (x1,y1)
 NB. line at end
 linepattern2=: 4 : 0
 len=. - -/ y
-n=. rndint (%: +/ *: len) % +/ x
+n=. roundint (%: +/ *: len) % +/ x
 if. n=0 do. y
 else.
   j=. +/\ 0 , , n # ,: x
@@ -128,296 +112,12 @@ FontScale * getascender y
 )
 
 NB. =========================================================
-rotxy=: 3 : 0
-if. ROT do.
-  'px py'=. y
-  (Sh-py),px
-else.
-  y
-end.
-)
-
-NB. =========================================================
-rotxym=: 3 : 0
-if. ROT do.
-  'px py'=. |:y
-  (Sh-py),.px
-else.
-  y
-end.
-)
-
-NB. =========================================================
 setsize=: 3 : 0
 Pxywh=: 0 0,Size=: y
 EMPTY
 )
-
-NB. =========================================================
-wraptext=: 3 : 0
-'BT ',y,' ET '
-)
-
-NB. =========================================================
-write=: 4 : 0
-dat=. x
-file=. y
-while. _1 -: dat flwrite file do.
-  msg=. 'Unable to write to file: ',file,LF,LF
-  if. #d=. 1!:0 file do.
-    msg=. msg, 'If the file is open in Adobe, close the file and try again.'
-    if. 1 query msg do. return. end.
-  else.
-    info msg,'The file name is invalid.' return. end.
-end.
-)
-NB. bezier
-
-NB. =========================================================
-NB. bezierarc
-NB.
-NB. original from Oleg Kobchenko
-NB.
-NB. y is:
-NB.   xy center, radius, angle1, angle2 (degrees)
-bezierarc=: 3 : 0
-'x y h a b'=. y
-off=. 90
-t1=. rfd 360 | a - off
-t2=. rfd 360 | b - off
-th=. 6 %~ 2p1 | t2 - t1
-'c c1 s s1'=. (cos , sin) th,t1
-x0=. x1=. 1 [ y0=. 0
-'x3 y3'=. c,s
-x2=. 3%~ (8*cos-:th)-x0+x3+3*x1
-y2=. y3-(-x2-x3)%-tan th
-y1=. 3%~ (8*sin-:th)-y0+y3+3*y2
-r=. (x0,x1,x2,x3),:y0,y1,y2,y3
-r=. r +/ . *~ (c1,-s1),:s1,c1
-r=. r (+/ . *)^:(i.6)~ (c,-s),:s,c
-,@|:"2 (x,y)+"2 h*r
-)
-NB. cid
-NB.
-NB. Each asian font is a text string in 3 parts,
-NB. written to 3 objects.
-NB.
-NB. This is fixed up by:
-NB.   %prev is replaced with the previous object number.
-NB.   /Name F has the font number appended
-
-CIDFONTS=: 'MSung-Light';'STSong-Light'
-
-NB. =========================================================
-MSUNGLIGHT=: 0 : 0
-/Type /FontDescriptor
-/FontName /MSung-Light
-/Flags 5
-/FontBBox [ -260 -174 1043 826 ]
-/MissingWidth 600
-/StemV 93
-/ItalicAngle 0
-/CapHeight 625
-/Ascent 826
-/Descent -174
-
-/Type /Font
-/Subtype /CIDFontType0
-/BaseFont /MSung-Light
-/FontDescriptor %prev 0 R
-/CIDSystemInfo << /Registry (Adobe)/Ordering (CNS1)/Supplement 4 >>
-/DW 1200
-/W [ 1 255 600 ]
-
-/Type /Font
-/Subtype /Type0
-/Name /F
-/BaseFont /MSung-Light
-/DescendantFonts [ %prev 0 R ]
-/Encoding /UniCNS-UTF16-H
-)
-
-NB. =========================================================
-STSONGLIGHT=: 0 : 0
-/Type /FontDescriptor
-/FontName /STSong-Light
-/Flags 5
-/FontBBox [ -260 -174 1043 826 ]
-/MissingWidth 600
-/StemV 93
-/ItalicAngle 0
-/CapHeight 625
-/Ascent 826
-/Descent -174
-
-/Type /Font
-/Subtype /CIDFontType0
-/BaseFont /STSong-Light
-/FontDescriptor %prev 0 R
-/CIDSystemInfo << /Registry (Adobe)/Ordering (GB1)/Supplement 4 >>
-/DW 1200
-/W [ 1 255 600 ]
-
-/Type /Font
-/Subtype /Type0
-/Name /F
-/BaseFont /STSong-Light
-/DescendantFonts [ %prev 0 R ]
-/Encoding /UniGB-UTF16-H
-)
-NB. cmds
-NB.
-NB. pdf graphics command utilities
-
-NB. =========================================================
-NB. pdf_circle
-NB.
-NB. returns bezier points to draw circle
-NB. with given center and radius
-NB.
-NB. result is 4 row table, each row being a 90 degree arc.
-pdf_circle=: 3 : 0
-'x y r'=. y
-arc=. _2 [\ 0 1 2 1 1 2 1 0 { 0 1, 4r3*<:%:2
-arr=. |."1 arc *"1 [ _1 1
-mat=. _4 ,\ arc,arr,-arc,arr
-(mat * r) + ($mat) $ x,y
-)
-
-NB. =========================================================
-pdf_colorstroke=: 3 : 0
-(": y % 255),"1 ' RG '
-)
-
-NB. =========================================================
-pdf_colorfill=: 3 : 0
-(": y % 255),"1 ' rg '
-)
-
-NB. =========================================================
-pdf_color=: 3 : 0
-clr=. ": y % 255
-clr ,"1 ' RG ' ,"1 clr ,"1 ' rg '
-)
-
-NB. =========================================================
-pdf_makelines=: 3 : 0
-if. 2 > #$y do.
-  ,: (pfmt 2 {. y),' m ',,(pfmt _2 [\ 2 }. y) ,"1 ' l '
-else.
-  mov=. (pfmt 2 {."1 y) ,"1 ' m '
-  lns=. ,"2 (pfmt _2 [\"1 [ 2 }."1 y) ,"1 ' l '
-  mov,.lns
-end.
-)
-
-NB. =========================================================
-NB. codes to set pen
-NB.
-NB. pdf_pen    one color, one size
-NB. pdf_pens   several colors, several sizes
-pdf_pens=: 4 : 0
-(pdf_color x) ,"1 (":,.PenScale*y) ,"1 ' w '
-)
-
-NB. =========================================================
-pdf_pen=: 4 : 0
-(pdf_color ,x), (":PenScale*y) ,' w '
-)
-
-NB. =========================================================
-pdf_lines=: 3 : 0
-(pdf_makelines y) ,"1 ' S'
-)
-
-NB. =========================================================
-NB. pdf_text
-NB.
-NB. single alignment, single font
-pdf_text=: 4 : 0
-0 pdf_text y  NB. x  1=use cid font
-:
-'fnt clr txt pos align rot und'=. y
-
-clr=. pdf_color clr
-
-txt=. ,each boxopen txt
-
-NB. ---------------------------------------------------------
-if. und +. align e. iCenter, iRight do.
-  len=. fnt pgetstringlen txt
-end.
-
-NB. ---------------------------------------------------------
-NB. convert utf8 to ucs2, then big endian encoding
-if. x do.
-  txt=. toucode1@(7&u:) each txt
-else.
-  txt=. u2a each txt
-end.
-
-txt=. pdfesc each txt
-
-NB. ---------------------------------------------------------
-select. rot
-
-case. 0 do.
-  select. align
-  case. iCenter do.
-    pos=. pos -"1 (-:len),.0
-  case. iRight do.
-    pos=. pos -"1 len,.0
-  end.
-  txt=. (<' Tm (') ,each txt ,each <') Tj '
-  res=. clr,(<"1 '1 0 0 1 ' ,"1 pfmt pos >. 0) ,&> txt
-case. 1 do.
-  select. align
-  case. iCenter do.
-    pos=. pos -"1 [ 0,.-:len
-  case. iRight do.
-    pos=. pos -"1 [ 0,.len
-  end.
-  txt=. (<' Tm (') ,each txt ,each <') Tj '
-  res=. clr,(<"1 '0 1 -1 0 ' ,"1 pfmt pos >. 0) ,&> txt
-case. 2 do.
-  select. align
-  case. iCenter do.
-    pos=. pos +"1 [ 0,.-:len
-  case. iRight do.
-    pos=. pos +"1 [ 0,.len
-  end.
-  txt=. (<' Tm (') ,each txt ,each <') Tj '
-  res=. clr,(<"1 '0 -1 1 0 ' ,"1 pfmt pos >. 0) ,&> txt
-end.
-
-NB. ---------------------------------------------------------
-if. -. und do. res;'' return. end.
-
-NB. ---------------------------------------------------------
-NB. underline
-pos=. citemize pos
-len=. , len
-
-'off lwd'=. getunderline fnt
-lin=. clr,' ',(":lwd) ,' w '
-
-select. rot
-case. 0 do.
-  bgn=. 0 >. pos -"1 [ 0,.-off
-  end=. bgn + len,.0
-case. 1 do.
-  bgn=. 0 >. pos -"1 off,.0
-  end=. bgn + 0,.len
-case. 2 do.
-  bgn=. 0 >. pos +"1 off,.0
-  end=. bgn - 0,.len
-end.
-
-lin=. lin,(pdf_makelines bgn,.end) ,"1 ' b'
-res;lin
-
-)
 NB. pdf draw
+NB. based on Plot/out/pdf/draw, but leaving out unused parameters
 
 NB. =========================================================
 pdfcircle=: 3 : 0
@@ -470,7 +170,7 @@ end.
 
 NB. =========================================================
 pdffill=: 3 : 0
-pdfrect 0;'';y;Pxywh
+pdfrect y;Pxywh
 )
 
 NB. =========================================================
@@ -621,8 +321,423 @@ else.
 end.
 
 NB. ---------------------------------------------------------
-pbuf wraptext txt
+pbuf pdf_wraptext txt
 pbuf rlin
+)
+NB. tics
+
+NB. =========================================================
+NB. getticpos
+NB. get tic positions for data
+NB.
+NB. form: getticpos int;tic;min;max;cnt
+NB.   int  axis intercept
+NB.   tic  tic step size or 0=calculated
+NB.   min  minumum value
+NB.   max  maximum value
+NB.   cnt  maximum number of tic subdivisions
+NB. returns min;max;step;int;pos
+getticpos=: 3 : 0
+
+'int tic min max cnt'=. y
+
+NB. ---------------------------------------------------------
+NB. nudge min, max in case near a nice boundary:
+nmm=. 10 ^ <. <: 10 ^. max - min
+min=. nmm rounddown min
+max=. nmm roundup max
+
+wid=. max - min
+
+NB. ---------------------------------------------------------
+if. wid=0 do.
+  if. #int do.
+    if. int=min do.
+      'min max'=. straddle min
+    else.
+      'min max'=. sort int, min
+    end.
+  else.
+    'min max'=. straddle int=. min
+  end.
+end.
+
+NB. ---------------------------------------------------------
+if. #int do.
+  max=. max >. int
+  min=. min <. int
+else.
+  if. (min <: 0) *. max >: 0 do.
+    int=. 0
+  end.
+end.
+
+NB. ---------------------------------------------------------
+if. tic > 0 do.
+  s=. tic * 1 + i.10
+else.
+  s=. 1 2 5 10 20 50 100 * pow10 <: <. log10 max - min
+end.
+
+if. min < 0 do.
+  x=. s roundup min
+else.
+  x=. s rounddown min
+end.
+if. max > 0 do.
+  y=. s rounddown max
+else.
+  y=. s roundup max
+end.
+
+NB. ---------------------------------------------------------
+c=. <. (y - x) % s
+ndx=. (c <: cnt) i. 1
+step=. ndx { s,0
+
+if. (step=0) +. ndx = #x do.
+  pos=. ''
+else.
+  pos=. (ndx{x) + step * i. 1 + ndx{c
+  min=. min <. {. pos
+  max=. max >. {: pos
+end.
+
+NB. ---------------------------------------------------------
+if. 0=#int do.
+  if. max > 0 do.
+    int=. 0 >. min
+  else.
+    int=. max
+  end.
+end.
+
+NB. ---------------------------------------------------------
+step;min;max;int;pos
+)
+NB. util
+
+NB. pdf always use big endian
+endian=. ({.a.)={. 1&(3!:4) 1  NB. 0 little endian   1 big endian
+toucodem=: ''&,@(1&(3!:4))@(3&u:)@u:
+toucoder=: ''&,@:,@:(|."1@(_2: ]\ 1&(3!:4)))@(3&u:)@u:
+toucode1=: toucodem`toucoder@.(-.endian) f.
+4!:55 <'endian'  NB. Remove definition of 'endian' to avoid problems if the name is publicly assigned later
+
+NB. =========================================================
+NB. jpf_getparms
+jpf_getparms=: 3 : 0
+(PDF_DEFSIZE;JPF_DEFFILE) output_parms y
+)
+
+NB. =========================================================
+pdf_boxrs2wh=: 3 : 0
+a=. 2 {."1 y
+b=. 2 }."1 y
+(a <. b) ,"1 | a - b
+)
+
+NB. =========================================================
+NB. pdf_getparms
+pdf_getparms=: 3 : 0
+(PDF_DEFSIZE;PDF_DEFFILE) output_parms y
+)
+
+NB. =========================================================
+NB. pdf_dict
+pdf_dict=: 3 : 0
+if. L. y do.
+  s=. ; y ,each <LF
+else.
+  s=. y , (LF ~: {: y) # LF
+end.
+'<<',LF,s,'>>',LF
+)
+
+NB. =========================================================
+pdf_rotxy=: 3 : 0
+if. ROT do.
+  'px py'=. y
+  (Sh-py),px
+else.
+  y
+end.
+)
+
+NB. =========================================================
+pdf_rotxym=: 3 : 0
+if. ROT do.
+  'px py'=. |:y
+  (Sh-py),.px
+else.
+  y
+end.
+)
+
+NB. =========================================================
+pdf_wraptext=: 3 : 0
+'BT ',y,' ET '
+)
+
+NB. =========================================================
+pdf_write=: 4 : 0
+dat=. x
+file=. y
+while. _1 -: dat flwrite file do.
+  msg=. 'Unable to write to file: ',file,LF,LF
+  if. #d=. 1!:0 file do.
+    msg=. msg, 'If the file is open in Adobe, close the file and try again.'
+    if. 1 query msg do. return. end.
+  else.
+    info msg,'The file name is invalid.' return. end.
+end.
+if. VISIBLE do.
+  viewpdf_j_ file
+end.
+)
+NB. bezier
+
+NB. =========================================================
+NB. bezierarc
+NB.
+NB. original from Oleg Kobchenko
+NB.
+NB. y is:
+NB.   xy center, radius, angle1, angle2 (degrees)
+bezierarc=: 3 : 0
+'x y h a b'=. y
+off=. 90
+t1=. rfd 360 | a - off
+t2=. rfd 360 | b - off
+th=. 6 %~ 2p1 | t2 - t1
+'c c1 s s1'=. (cos , sin) th,t1
+x0=. x1=. 1 [ y0=. 0
+'x3 y3'=. c,s
+x2=. 3%~ (8*cos-:th)-x0+x3+3*x1
+y2=. y3-(-x2-x3)%-tan th
+y1=. 3%~ (8*sin-:th)-y0+y3+3*y2
+r=. (x0,x1,x2,x3),:y0,y1,y2,y3
+r=. r +/ . *~ (c1,-s1),:s1,c1
+r=. r (+/ . *)^:(i.6)~ (c,-s),:s,c
+,@|:"2 (x,y)+"2 h*r
+)
+NB. cid
+NB.
+NB. Each asian font is a text string in 3 parts,
+NB. written to 3 objects.
+NB.
+NB. This is fixed up by:
+NB.   %prev is replaced with the previous object number.
+NB.   /Name F has the font number appended
+
+MSUNGLIGHT=: 0 : 0
+/Type /FontDescriptor
+/FontName /MSung-Light
+/Flags 5
+/FontBBox [ -260 -174 1043 826 ]
+/MissingWidth 600
+/StemV 93
+/ItalicAngle 0
+/CapHeight 625
+/Ascent 826
+/Descent -174
+
+/Type /Font
+/Subtype /CIDFontType0
+/BaseFont /MSung-Light
+/FontDescriptor %prev 0 R
+/CIDSystemInfo << /Registry (Adobe)/Ordering (CNS1)/Supplement 4 >>
+/DW 1200
+/W [ 1 255 600 ]
+
+/Type /Font
+/Subtype /Type0
+/Name /F
+/BaseFont /MSung-Light
+/DescendantFonts [ %prev 0 R ]
+/Encoding /UniCNS-UTF16-H
+)
+
+NB. =========================================================
+STSONGLIGHT=: 0 : 0
+/Type /FontDescriptor
+/FontName /STSong-Light
+/Flags 5
+/FontBBox [ -260 -174 1043 826 ]
+/MissingWidth 600
+/StemV 93
+/ItalicAngle 0
+/CapHeight 625
+/Ascent 826
+/Descent -174
+
+/Type /Font
+/Subtype /CIDFontType0
+/BaseFont /STSong-Light
+/FontDescriptor %prev 0 R
+/CIDSystemInfo << /Registry (Adobe)/Ordering (GB1)/Supplement 4 >>
+/DW 1200
+/W [ 1 255 600 ]
+
+/Type /Font
+/Subtype /Type0
+/Name /F
+/BaseFont /STSong-Light
+/DescendantFonts [ %prev 0 R ]
+/Encoding /UniGB-UTF16-H
+)
+NB. pdf cmds
+NB.
+NB. pdf graphics command utilities
+
+NB. =========================================================
+NB. pdf_circle
+NB.
+NB. returns bezier points to draw circle
+NB. with given center and radius
+NB.
+NB. result is 4 row table, each row being a 90 degree arc.
+pdf_circle=: 3 : 0
+'x y r'=. y
+arc=. _2 [\ 0 1 2 1 1 2 1 0 { 0 1, 4r3*<:%:2
+arr=. |."1 arc *"1 [ _1 1
+mat=. _4 ,\ arc,arr,-arc,arr
+(mat * r) + ($mat) $ x,y
+)
+
+
+NB. =========================================================
+pdf_colorstroke=: 3 : 0
+(": y % 255),"1 ' RG '
+)
+
+NB. =========================================================
+pdf_colorfill=: 3 : 0
+(": y % 255),"1 ' rg '
+)
+
+NB. =========================================================
+pdf_color=: 3 : 0
+clr=. ": y % 255
+clr ,"1 ' RG ' ,"1 clr ,"1 ' rg '
+)
+
+NB. =========================================================
+pdf_makelines=: 3 : 0
+if. 2 > #$y do.
+  ,: (pfmt 2 {. y),' m ',,(pfmt _2 [\ 2 }. y) ,"1 ' l '
+else.
+  mov=. (pfmt 2 {."1 y) ,"1 ' m '
+  lns=. ,"2 (pfmt _2 [\"1 [ 2 }."1 y) ,"1 ' l '
+  mov,.lns
+end.
+)
+
+NB. =========================================================
+NB. codes to set pen
+NB.
+NB. pdf_pen    one color, one size
+NB. pdf_pens   several colors, several sizes
+pdf_pens=: 4 : 0
+(pdf_color x) ,"1 (":,.PDF_PENSCALE*y) ,"1 ' w '
+)
+
+NB. =========================================================
+pdf_pen=: 4 : 0
+(pdf_color ,x), (":PDF_PENSCALE*y) ,' w '
+)
+
+NB. =========================================================
+pdf_lines=: 3 : 0
+(pdf_makelines y) ,"1 ' S'
+)
+
+NB. =========================================================
+NB. pdf_text
+NB.
+NB. single alignment, single font
+pdf_text=: 4 : 0
+0 pdf_text y  NB. x  1=use cid font
+:
+'fnt clr txt pos align rot und'=. y
+
+clr=. pdf_color clr
+
+txt=. ,each boxopen txt
+
+NB. ---------------------------------------------------------
+if. und +. align e. iCENTER, iRIGHT do.
+  len=. fnt pgetstringlen txt
+end.
+
+NB. ---------------------------------------------------------
+NB. convert utf8 to ucs2, then big endian encoding
+if. x do.
+  txt=. toucode1@(7&u:) each txt
+else.
+  txt=. u2a each txt
+end.
+
+txt=. pdfesc each txt
+
+NB. ---------------------------------------------------------
+select. rot
+
+case. 0 do.
+  select. align
+  case. iCENTER do.
+    pos=. pos -"1 (-:len),.0
+  case. iRIGHT do.
+    pos=. pos -"1 len,.0
+  end.
+  txt=. (<' Tm (') ,each txt ,each <') Tj '
+  res=. clr,(<"1 '1 0 0 1 ' ,"1 pfmt pos >. 0) ,&> txt
+case. 1 do.
+  select. align
+  case. iCENTER do.
+    pos=. pos -"1 [ 0,.-:len
+  case. iRIGHT do.
+    pos=. pos -"1 [ 0,.len
+  end.
+  txt=. (<' Tm (') ,each txt ,each <') Tj '
+  res=. clr,(<"1 '0 1 -1 0 ' ,"1 pfmt pos >. 0) ,&> txt
+case. 2 do.
+  select. align
+  case. iCENTER do.
+    pos=. pos +"1 [ 0,.-:len
+  case. iRIGHT do.
+    pos=. pos +"1 [ 0,.len
+  end.
+  txt=. (<' Tm (') ,each txt ,each <') Tj '
+  res=. clr,(<"1 '0 -1 1 0 ' ,"1 pfmt pos >. 0) ,&> txt
+end.
+
+NB. ---------------------------------------------------------
+if. -. und do. res;'' return. end.
+
+NB. ---------------------------------------------------------
+NB. underline
+pos=. citemize pos
+len=. , len
+
+'off lwd'=. getunderline fnt
+lin=. clr,' ',(":lwd) ,' w '
+
+select. rot
+case. 0 do.
+  bgn=. 0 >. pos -"1 [ 0,.-off
+  end=. bgn + len,.0
+case. 1 do.
+  bgn=. 0 >. pos -"1 off,.0
+  end=. bgn + 0,.len
+case. 2 do.
+  bgn=. 0 >. pos +"1 off,.0
+  end=. bgn - 0,.len
+end.
+
+lin=. lin,(pdf_makelines bgn,.end) ,"1 ' b'
+res;lin
+
 )
 NB. escape sequence of pdf
 NB.
@@ -664,170 +779,6 @@ if. 1 e. msk do.
 end.
 
 txt
-)
-NB. make
-
-NB. =========================================================
-NB. fonts
-FONTOBJ=: 0 : 0
-<<
-/Type /Font
-/Subtype /Type1
-/Name /FXX
->>
-)
-
-NB. =========================================================
-TRAILER=: 0 : 0
-trailer
-<<
-/Size {z}
-/Info 1 0 R
-/Root 2 0 R
->>
-startxref
-)
-
-NB. =========================================================
-NB. build for Publish
-buildjpf=: 3 : 0
-top=. (":Size),';',(;PDFFonts ,each ','),';'
-top,LF,buf
-)
-
-NB. =========================================================
-NB.*pdf_build v build for PDF
-NB.-  1 Info
-NB.-  2 Catalog
-NB.-  3+ Fonts
-NB.-  +4 Pages
-NB.-  +5 Page
-NB.-  +6 Content
-NB.-
-NB.- wrap adds:
-NB.-S  Xref
-NB.-  Trailer
-buildpdf=: 3 : 0
-PDFFontpages=: fontpages ''
-wrap (header''),page y
-)
-
-NB. =========================================================
-NB. creationdate
-creationdate=: 3 : 0
-t=. '20', ; _2 {.each '0' ,each ": each <. 6!:0''
-'/CreationDate (D:',t,')'
-)
-
-NB. =========================================================
-cidfont=: 4 : 0
-txt=. LF;<;.2 ". toupper y -. '-'
-msk=. 1 = #&> txt
-txt=. msk<@;;._1 txt
-txt=. (<'<<',LF) ,each txt ,each <'>>',LF
-'a b c'=. txt
-prev=. x { 3 + 0 0, +/\PDFFontpages
-b=. b rplc '%prev';":prev
-c=. c rplc '%prev';":prev+1
-c=. c rplc '/Name /F';'/Name /F',":x
-a;b;c
-)
-
-NB. =========================================================
-NB. fonts
-fonts=: 3 : 0
-ndx=. 1 i.~ 'XX' E. FONTOBJ
-hdr=. ndx {. FONTOBJ
-ftr=. (ndx+2) }. FONTOBJ
-r=. ''
-for_f. PDFFonts do.
-  if. f e. CIDFONTS do.
-    r=. r, ( 1+f_index) cidfont >f
-  else.
-    fnt=. (": 1 + f_index),LF,'/BaseFont /', >f
-    fnt=. fnt,LF,'/Encoding /WinAnsiEncoding'
-    r=. r, <hdr, fnt, ftr
-  end.
-end.
-)
-
-NB. =========================================================
-NB. count of pages used for fonts
-NB. each cid font use 3 obj
-fontpages=: 3 : 0
-1 + 2 * PDFFonts e. CIDFONTS
-)
-
-NB. =========================================================
-header=: 3 : 0
-t=. '/Title (Pdfdraw)'
-a=. '/Author (',(({.~i.&'/') 9!:14''),')'
-p=. '/Producer (Pdfdraw)'
-d=. creationdate''
-tit=. dict t;a;p;d
-pag=. ": 3 + +/ PDFFontpages
-cat=. dict '/Type /Catalog',LF,'/Pages ',pag,' 0 R',LF
-fnt=. fonts ''
-tit;cat;fnt
-)
-
-NB. =========================================================
-NB. pages
-page=: 3 : 0
-kp=. 4 + +/ PDFFontpages
-r=. '/Type /Pages',LF
-r=. r, pageheader''
-r=. r, '/MediaBox [',(pfmt Pxywh),']',LF
-r=. r,'/Kids [',(":kp),' 0 R]',LF
-r=. r, '/Count 1',LF
-res=. dict r
-
-NB. ---------------------------------------------------------
-r=. '/Type /Page',LF
-r=. r,'/Parent ',(":kp-1),' 0 R',LF
-r=. r,'/Contents ',(":kp+1),' 0 R',LF
-res=. res ; dict r
-
-NB. ---------------------------------------------------------
-t=. y
-s=. '<< /Length ',(":#t),' >>',LF
-res ,< s,'stream',LF,t,'endstream',LF
-)
-
-NB. =========================================================
-NB. pages header
-pageheader=: 3 : 0
-r=. '/Resources',LF,'<<',LF,' /ProcSet [/PDF /Text]',LF
-r=. r,' /Font <<',LF
-fx=. ' /F'&, &> ": each 1 + i.#PDFFonts
-px=. ' ',. ": &> 2 + +/\ PDFFontpages
-r=. r, ,fx ,"1 px ,"1 ' 0 R',LF
-r=. r,' >>',LF,'>>',LF
-)
-
-NB. =========================================================
-wrap=: 3 : 0
-z=. ": 1 + #y
-r=. '%PDF-1.4',LF
-r=. r, '%', (a. {~128 + a. i. 'elmo'),LF
-
-NB. ---------------------------------------------------------
-NB. note the xref section must have exactly 20 characters
-NB. per line - otherwise Adobe rebuildpdfs the xref when
-NB. the file is loaded
-s=. 'xref',LF,'0 ',z,LF
-s=. s,(10#'0'),' 65535 f ',LF
-
-for_i. i.#y do.
-  s=. s,(_10 {.!.'0' ": #r),' 00000 n ',LF
-  c=. LF,(>i{y)
-  r=. r,(":1+i),' 0 obj',c,'endobj',LF,LF
-end.
-
-NB. ---------------------------------------------------------
-ndx=. I. '{z}' E. TRAILER
-tr=. (ndx {. TRAILER), z, (ndx+3) }. TRAILER
-r,s,LF,tr,(":#r),LF,'%%EOF'
 )
 NB. markers
 
@@ -892,4 +843,188 @@ p=. 6 $"1 y
 d=. (4 * x) * , (sin,.cos) 2p1 * 0 1 2 % 3
 p=. p +"1 d
 pbuf (pdf_makelines p) ,"1 ' b'
+)
+NB. build
+
+NB. =========================================================
+NB. fonts
+PDF_FONTOBJ=: 0 : 0
+<<
+/Type /Font
+/Subtype /Type1
+/Name /FXX
+>>
+)
+
+NB. =========================================================
+PDF_TRAILER=: 0 : 0
+trailer
+<<
+/Size {z}
+/Info 1 0 R
+/Root 2 0 R
+>>
+startxref
+)
+
+NB. =========================================================
+NB. build
+NB.  1 Info
+NB.  2 Catalog
+NB.  3+ Fonts
+NB.  +4 Pages
+NB.  +5 Page
+NB.  +6 Content
+NB.
+NB. pdf_wrap adds:
+NB.  Xref
+NB.  Trailer
+pdf_build=: 3 : 0
+PDFFontpages=: pdf_fontpages ''
+pdf_wrap (pdf_header''),pdf_page y
+)
+
+NB. =========================================================
+NB. pdf_creationdate
+pdf_creationdate=: 3 : 0
+t=. '20', ; _2 {.each '0' ,each ": each <. 6!:0''
+'/CreationDate (D:',t,')'
+)
+
+NB. =========================================================
+pdf_cidfont=: 4 : 0
+txt=. LF;<;.2 ". toupper y -. '-'
+msk=. 1 = #&> txt
+txt=. msk<@;;._1 txt
+txt=. (<'<<',LF) ,each txt ,each <'>>',LF
+'a b c'=. txt
+prev=. x { 3 + 0 0, +/\PDFFontpages
+b=. b rplc '%prev';":prev
+c=. c rplc '%prev';":prev+1
+c=. c rplc '/Name /F';'/Name /F',":x
+a;b;c
+)
+
+NB. =========================================================
+NB. fonts
+pdf_fonts=: 3 : 0
+ndx=. 1 i.~ 'XX' E. PDF_FONTOBJ
+hdr=. ndx {. PDF_FONTOBJ
+ftr=. (ndx+2) }. PDF_FONTOBJ
+r=. ''
+for_f. PDFFonts do.
+  if. f e. CIDFONTS do.
+    r=. r, ( 1+f_index) pdf_cidfont >f
+  else.
+    fnt=. (": 1 + f_index),LF,'/BaseFont /', >f
+    fnt=. fnt,LF,'/Encoding /WinAnsiEncoding'
+    r=. r, <hdr, fnt, ftr
+  end.
+end.
+)
+
+NB. =========================================================
+NB. count of pages used for fonts
+NB. each cid font use 3 obj
+pdf_fontpages=: 3 : 0
+1 + 2 * PDFFonts e. CIDFONTS
+)
+
+NB. =========================================================
+pdf_header=: 3 : 0
+t=. '/Title (Plot)'
+a=. '/Author (',(9!:14''),')'
+p=. '/Producer (J Plot)'
+d=. pdf_creationdate''
+tit=. pdf_dict t;a;p;d
+pag=. ": 3 + +/ PDFFontpages
+cat=. pdf_dict '/Type /Catalog',LF,'/Pages ',pag,' 0 R',LF
+fnt=. pdf_fonts ''
+tit;cat;fnt
+)
+
+NB. =========================================================
+NB. pdf_pages
+pdf_page=: 3 : 0
+kp=. 4 + +/ PDFFontpages
+r=. '/Type /Pages',LF
+r=. r, pdf_pageheader''
+r=. r, '/MediaBox [',(pfmt Pxywh),']',LF
+r=. r,'/Kids [',(":kp),' 0 R]',LF
+r=. r, '/Count 1',LF
+res=. pdf_dict r
+
+NB. ---------------------------------------------------------
+r=. '/Type /Page',LF
+r=. r,'/Parent ',(":kp-1),' 0 R',LF
+r=. r,'/Contents ',(":kp+1),' 0 R',LF
+res=. res ; pdf_dict r
+
+NB. ---------------------------------------------------------
+t=. y
+s=. '<< /Length ',(":#t),' >>',LF
+res ,< s,'stream',LF,t,'endstream',LF
+)
+
+NB. =========================================================
+NB. pdf_pages header
+pdf_pageheader=: 3 : 0
+r=. '/Resources',LF,'<<',LF,' /ProcSet [/PDF /Text]',LF
+r=. r,' /Font <<',LF
+fx=. ' /F'&, &> ": each 1 + i.#PDFFonts
+px=. ' ',. ": &> 2 + +/\ PDFFontpages
+r=. r, ,fx ,"1 px ,"1 ' 0 R',LF
+r=. r,' >>',LF,'>>',LF
+)
+
+NB. =========================================================
+pdf_wrap=: 3 : 0
+z=. ": 1 + #y
+r=. '%PDF-1.3',LF
+r=. r, '%', (a. {~128 + a. i. 'elmo'),LF
+
+NB. ---------------------------------------------------------
+NB. note the xref section must have exactly 20 characters
+NB. per line - otherwise Adobe rebuilds the xref when
+NB. the file is loaded
+s=. 'xref',LF,'0 ',z,LF
+s=. s,(10#'0'),' 65535 f ',LF
+
+for_i. i.#y do.
+  s=. s,(_10 {.!.'0' ": #r),' 00000 n ',LF
+  c=. LF,(>i{y)
+  r=. r,(":1+i),' 0 obj',c,'endobj',LF,LF
+end.
+
+NB. ---------------------------------------------------------
+ndx=. I. '{z}' E. PDF_TRAILER
+tr=. (ndx {. PDF_TRAILER), z, (ndx+3) }. PDF_TRAILER
+r,s,LF,tr,(":#r),LF,'%%EOF'
+)
+NB. fini
+NB. additions to plot source
+
+PDF_PENSCALE=: PenScale
+PDF_DEFSIZE=: Size
+
+NB. =========================================================
+NB. builds
+buildpdf=: pdf_build
+
+buildjpf=: 3 : 0
+top=. (":Size),';',(;PDFFonts ,each ','),';'
+top,LF,buf
+)
+
+NB. =========================================================
+pdf_header=: 3 : 0
+t=. '/Title (Pdfdraw)'
+a=. '/Author (',(({.~i.&'/') 9!:14''),')'
+p=. '/Producer (Pdfdraw)'
+d=. pdf_creationdate''
+tit=. pdf_dict t;a;p;d
+pag=. ": 3 + +/ PDFFontpages
+cat=. pdf_dict '/Type /Catalog',LF,'/Pages ',pag,' 0 R',LF
+fnt=. pdf_fonts ''
+tit;cat;fnt
 )
