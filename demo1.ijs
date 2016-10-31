@@ -1,3 +1,4 @@
+NB. source for pdfdraw demo1
 
 require 'graphics/pdfdraw'
 
@@ -21,7 +22,7 @@ txt=. 'with a large dish of tarts upon it ...'
 pdftext txt;0 0 12 0 0;0;Black;200 60
 txt=. 'Rotated text'
 pdftext txt;0 0 12 90 0;10;Black;180 50
-pdfcircle 1;Orchid;'';120 50 25
+pdfcircle 1;Orchid;'';120 50 26
 pdfdot 10;0 0 255;120 50
 pdftext 'test pdfdraw';0 2 8 0 0;0;Black;350 12
 )

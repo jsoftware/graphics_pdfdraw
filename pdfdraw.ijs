@@ -4,24 +4,23 @@ require 'colortab trig graphics/afm'
 
 coinsert 'jafm'
 
-". COLORTABLE
+Size=: 480 360 NB. window size
+FontScale=: 0.75 NB. scale screen fonts to PDF fonts
+PenScale=: 0.4 NB. pen size
+NB. util
 
-Size=: 480 360
-
-FontScale=: 0.75
-PenScale=: 0.4
 FontSizeMin=: 0
-
 PDFFonts=: ,<'Helvetica'
 PDFClip=: 0 NB. count of clip stack
-
 CIDFONTS=: 'MSung-Light';'STSong-Light'
-NB. util
 
 buf=: ''
 
 ('i',each ;: 'LEFT CENTER RIGHT')=: i. 3
 
+". COLORTABLE
+
+NB. =========================================================
 is1color=: 3 = */@$
 citemize=: ,:^:(2 > #@$)
 getfontsize=: 13 : '{.1{._1 -.~ _1 ". y'
@@ -116,10 +115,19 @@ setsize=: 3 : 0
 Pxywh=: 0 0,Size=: y
 EMPTY
 )
-NB. pdf draw
-NB. based on Plot/out/pdf/draw, but leaving out unused parameters
+NB. draw
+NB.
+NB. these are the main pdfdraw functions
+NB.
+NB. position: x,y
+NB. color: RGB as values 0-255
 
 NB. =========================================================
+NB.*pdfcircle v draw circle
+NB.-v=pen size
+NB.-e=edge color
+NB.-c=unused
+NB.-p=position, radius
 pdfcircle=: 3 : 0
 'v e c p'=. y
 p=. citemize p
@@ -141,6 +149,10 @@ end.
 )
 
 NB. =========================================================
+NB.*pdfdot v draw dot
+NB.-v=pen size
+NB.-e=color
+NB.-p=position
 pdfdot=: 3 : 0
 'v e p'=. y
 p=. citemize p
@@ -154,12 +166,12 @@ end.
 )
 
 NB. =========================================================
-NB. set graph box clipping
+NB.*set graph box clipping
+NB.-y = xywh box
 pdffxywh=: 3 : 0
-p=. _1 pick y
-if. #p do.
+if. #y do.
   PDFClip=: >: PDFClip
-  pbuf 'q ',(":p),' re W n'
+  pbuf 'q ',(":y),' re W n'
 else.
   if. PDFClip do.
     PDFClip=: <: PDFClip
@@ -169,15 +181,17 @@ end.
 )
 
 NB. =========================================================
+NB.*pdffill v fill background
+NB.-y-color
 pdffill=: 3 : 0
 pdfrect y;Pxywh
 )
 
 NB. =========================================================
-NB. pdfline
-NB. pen size
-NB. color
-NB. positions
+NB.*pdfline
+NB.-v=pen size
+NB.-e=color
+NB.-p=points
 pdfline=: 3 : 0
 'v e p'=. y
 if. is1color e do.
@@ -193,6 +207,11 @@ end.
 )
 
 NB. =========================================================
+NB.*pdfmarker
+NB.-s=size
+NB.-m=marker type
+NB.-e=color
+NB.-p=position
 pdfmarker=: 3 : 0
 's m e p'=. y
 pbuf e pdf_pen 1
@@ -200,6 +219,11 @@ s ('pdfmark_',m)~ citemize p
 )
 
 NB. =========================================================
+NB.*pdfpie v draw pie chart
+NB.-v=edge pen size
+NB.-e=edge color
+NB.-c=slice colors
+NB.-p=slice begin/end angles
 pdfpie=: 3 : 0
 'v e c p'=. y
 pbuf e pdf_pen v
@@ -215,7 +239,11 @@ end.
 )
 
 NB. =========================================================
-NB. pdfline - patterned line
+NB.*pdfline - draw patterned line
+NB.-v=pen size
+NB.-s=pattern style index
+NB.-e=pen color
+NB.-p=line positions
 pdfpline=: 3 : 0
 'v s e p'=. y
 if. *./ s = 0 do.
@@ -239,6 +267,11 @@ end.
 )
 
 NB. =========================================================
+NB.*pdfpoly - draw polygon
+NB.-v=pen size
+NB.-e=edge color
+NB.-c=fill color
+NB.-p=vertex positions
 pdfpoly=: 3 : 0
 'v e c p'=. y
 if. v=0 do. e=. c end.
@@ -258,13 +291,13 @@ end.
 
 NB. =========================================================
 NB.*pdfrect v draw rectangle
-NB. argument has length 2 or 4
+NB.-argument has length 2 or 4
 NB.-if 2 elements given, these are fill and xywh with no border
 NB.-otherwise:
-NB.-  border width
-NB.-  border color
-NB.-  fill color
-NB.-  xywh matrix
+NB.-  v=border width
+NB.-  e=border color
+NB.-  c=fill color
+NB.-  p=xywh matrix
 pdfrect=: 3 : 0
 if. 2=#y do.
   'c p'=. y
@@ -278,10 +311,9 @@ pbuf clr ,"1 (pfmt p) ,"1 ' re B'
 )
 
 NB. =========================================================
-NB. pdftext
-NB. y is text;font;alignment;pencolor;position
-NB.
-NB. assumes single alignment, single font
+NB.*pdftext
+NB.-y is text;font;alignment;pencolor;position
+NB.-assumes single alignment, single font
 pdftext=: 3 : 0
 't f a e p'=. y
 
@@ -336,7 +368,7 @@ NB.   tic  tic step size or 0=calculated
 NB.   min  minumum value
 NB.   max  maximum value
 NB.   cnt  maximum number of tic subdivisions
-NB. returns min;max;step;int;pos
+NB. returns: min;max;step;int;pos
 getticpos=: 3 : 0
 
 'int tic min max cnt'=. y
@@ -1008,7 +1040,7 @@ PDF_PENSCALE=: PenScale
 PDF_DEFSIZE=: Size
 
 NB. =========================================================
-NB. builds
+NB. generate builds to PDF and to Publish JPF files
 buildpdf=: pdf_build
 
 buildjpf=: 3 : 0
@@ -1017,6 +1049,7 @@ top,LF,buf
 )
 
 NB. =========================================================
+NB. standard PDF header
 pdf_header=: 3 : 0
 t=. '/Title (Pdfdraw)'
 a=. '/Author (',(({.~i.&'/') 9!:14''),')'
