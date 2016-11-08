@@ -37,11 +37,11 @@ drawinit''
 drawsizes''
 pdffill DrawBack
 drawgraph''
-buf
 drawgrid''
 drawtitle''
 )
 drawinit=: 3 : 0
+buf=: ''
 FontHit=: Font vextent 'X'
 'Px Py Pw Ph'=: Pxywh=: 0 0,Size
 )
