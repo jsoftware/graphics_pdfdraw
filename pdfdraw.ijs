@@ -1046,7 +1046,7 @@ buildpdf=: pdf_build
 
 buildjpf=: 3 : 0
 top=. (":Size),';',(;PDFFonts ,each ','),';'
-top,LF,buf
+top,LF,dltbs buf
 )
 
 NB. =========================================================
