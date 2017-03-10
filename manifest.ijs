@@ -6,9 +6,9 @@ DESCRIPTION=: 0 : 0
 Utilities for drawing to a PDF file or a Publish JPF file.
 )
 
-VERSION=: '1.0.4'
+VERSION=: '1.0.5'
 
-RELEASE=: 'j804 j805'
+RELEASE=: 'j804 j805 j806'
 
 FILES=: 0 : 0
 barchart.ijs
