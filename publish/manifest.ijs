@@ -6,9 +6,9 @@ DESCRIPTION=: 0 : 0
 This is a sample project using Publish.
 )
 
-VERSION=: '1.0.2'
+VERSION=: '1.0.3'
 
-RELEASE=: 'j804 j805 j806'
+RELEASE=: 'j804 j805 j806 j807'
 
 DEPENDS=: 0 : 0
 afm
