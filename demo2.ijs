@@ -220,7 +220,7 @@ e=. +/ 1 12 * End - 1 0
 Months=: |."1[ 0 1 +"1 [ 0 12 #: b + i. 1 + e - b
 MonthLen=: #Months
 draw''
-f=. jpath '~Public/graphics/pdfdraw/publish/pdfdraw1.jpf'
+f=. jpath '~Addons/graphics/pdfdraw/publish/pdfdraw1.jpf'
 (buildjpf buf) fwritenew f
 f=. jpath '~temp/pdfdraw.pdf'
 (buildpdf buf) fwritenew f

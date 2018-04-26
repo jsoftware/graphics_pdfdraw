@@ -8,7 +8,9 @@ Utilities for drawing to a PDF file or a Publish JPF file.
 
 VERSION=: '1.0.6'
 
-RELEASE=: 'j804 j805 j806 j807'
+RELEASE=: ''
+
+FOLDER=: 'graphics/pdfdraw'
 
 FILES=: 0 : 0
 barchart.ijs

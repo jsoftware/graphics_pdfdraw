@@ -6,7 +6,7 @@ mkdir_j_ '~addons/demos/publish'
 NB. =========================================================
 f=. 3 : 0
 'fm to'=. 2$boxxopen y
-dat=. freads '~Public/graphics/pdfdraw/publish/',fm
+dat=. freads '~Addons/graphics/pdfdraw/publish/',fm
 dat fwritenew '~Addons/demos/publish/',to
 dat fwritenew '~addons/demos/publish/',to
 )
