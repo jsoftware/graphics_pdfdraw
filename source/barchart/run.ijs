@@ -1,7 +1,7 @@
 
 load 'graphics/pdfdraw'
 load '~Addons/graphics/pdfdraw/source/barchart.ijs'
-load '~Addons/graphics/pdfdraw/source/source/barchart/test.ijs'
+load '~Addons/graphics/pdfdraw/source/barchart/test.ijs'
 
 DAT=: gentest''
 

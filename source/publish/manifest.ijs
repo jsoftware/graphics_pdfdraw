@@ -8,7 +8,9 @@ This is a sample project using Publish.
 
 VERSION=: '1.0.3'
 
-RELEASE=: 'j804 j805 j806 j807'
+RELEASE=: ''
+
+FOLDER=: 'demos/publish'
 
 DEPENDS=: 0 : 0
 afm

@@ -1,6 +1,6 @@
 NB. build base pdfdraw
 
-P=: jpath '~Addons/graphics/pdfdraw/source/'
+P=: jpath '~Addons/graphics/pdfdraw/'
 
 f=. 3 : 0
 freads '~Plot/out/pdf/',y,'.ijs'

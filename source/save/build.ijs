@@ -1,7 +1,7 @@
 NB. build all pdfdraw
 
 f=: 3 : 0
-load '~Addons/graphics/pdfdraw/source/source/',y,'/build.ijs'
+load '~Addons/graphics/pdfdraw/source/',y,'/build.ijs'
 )
 
 f each ;: 'base barchart demo'
@@ -25,7 +25,7 @@ f=. jpath '~temp/pdfdraw_demo3.pdf'
 viewpdf_j_ f
 )
 
-dat=. dat rplc 'XXX';freads '~Addons/graphics/pdfdraw/source/source/barchart/test.ijs'
+dat=. dat rplc 'XXX';freads '~Addons/graphics/pdfdraw/source/barchart/test.ijs'
 dat fwritenew '~Addons/graphics/pdfdraw/source/demo3.ijs'
 
 NB. =========================================================
