@@ -6,7 +6,7 @@ DESCRIPTION=: 0 : 0
 Utilities for drawing to a PDF file or a Publish JPF file.
 )
 
-VERSION=: '1.0.6'
+VERSION=: '1.0.7'
 
 RELEASE=: ''
 
